@@ -1,30 +1,16 @@
 FROM pytorch/pytorch:2.2.1-cuda12.1-cudnn8-devel
 
 WORKDIR /app
-SHELL ["/bin/bash", "-l", "-euxo", "pipefail", "-c"]
-
 
 RUN apt-get update && apt-get install -y gcc g++ make wget curl && \
     rm -rf /var/lib/apt/lists/*
 
 #RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 #ENV NVM_DIR="/root/.nvm"
-ENV NVM_DIR /usr/local/nvm
-
-RUN mkdir -p "$NVM_DIR"; \
-    curl -o- \
-        "https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh" | \
-        bash \
-    ; \
-    source $NVM_DIR/nvm.sh; \
-    nvm install --lts --latest-npm
-
-# Add npm to the PATH by updating .bashrc
-RUN echo 'export NVM_DIR="/usr/local/nvm"' >> /etc/bash.bashrc \
-    && echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm' >> /etc/bash.bashrc \
-    && echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion' >> /etc/bash.bashrc \
-    && echo 'export PATH="/root/.nvm/versions/node/$(node -v)/bin:$PATH"' >> /etc/bash.bashrc
-
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash \
+    && export NVM_DIR="$HOME/.nvm" \
+    && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" \
+    && nvm install node
 # Apply changes to the current shell
 RUN . /root/.bashrc
 
