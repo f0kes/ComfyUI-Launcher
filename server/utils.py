@@ -8,6 +8,7 @@ import unicodedata
 import re
 import subprocess
 import threading
+import glob
 from tqdm import tqdm
 from urllib.parse import urlparse
 from settings import PROJECT_MAX_PORT, PROJECT_MIN_PORT, PROJECTS_DIR
@@ -223,20 +224,15 @@ def setup_custom_nodes_from_snapshot(project_folder_path, launcher_json):
         if custom_node_hash:
             # Checkout the specific hash
             run_command(["git", "checkout", custom_node_hash], cwd=custom_node_path)
+        
+        requirements_files = glob.glob(os.path.join(custom_node_path, "*requirements*.txt"))
 
-        pip_requirements_path = os.path.join(custom_node_path, "requirements.txt")
-        if os.path.exists(pip_requirements_path):
-            run_command_in_project_venv(
-                project_folder_path,
-                f"pip install -r {os.path.join(custom_node_path, 'requirements.txt')}",
-            )
-
-        pip_requirements_post_path = os.path.join(custom_node_path, "requirements_post.txt")
-        if os.path.exists(pip_requirements_post_path):
-            run_command_in_project_venv(
-                project_folder_path,
-                f"pip install -r {os.path.join(custom_node_path, 'requirements_post.txt')}",
-            )
+        for req_file in requirements_files:
+            if os.path.exists(req_file):
+                run_command_in_project_venv(
+                    project_folder_path,
+                    f"pip install -r {req_file}",
+                )
 
         install_script_path = os.path.join(custom_node_path, "install.py")
         if os.path.exists(install_script_path):
