@@ -22,8 +22,9 @@ ENV PATH $NVM_DIR/versions/node/$NODE_VERSION/bin:$PATH
 
 
 # add node and npm to path so the commands are available
-ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
-ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+#RUN ln -sf NVM_DIR/versions/node/v$NODE_VERSION/bin/node /usr/bin/nodejs
+#RUN ln -sf NVM_DIR/versions/node/v$NODE_VERSION/bin/node /usr/bin/node
+#RUN ln -sf NVM_DIR/versions/node/v$NODE_VERSION/bin/npm /usr/bin/npm
 
 RUN echo "source $NVM_DIR/nvm.sh && \
     nvm install $NODE_VERSION && \
@@ -58,4 +59,4 @@ COPY nginx.conf /etc/nginx/nginx.conf.template
 
 WORKDIR /app/server
 
-ENTRYPOINT ["./entrypoint.sh"] 
+CMD ["./entrypoint.sh"] 
