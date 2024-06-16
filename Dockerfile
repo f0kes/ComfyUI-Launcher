@@ -22,15 +22,16 @@ ENV PATH $NVM_DIR/versions/node/$NODE_VERSION/bin:$PATH
 
 
 
-RUN ln -sf NVM_DIR/versions/node/$NODE_VERSION/bin/node /usr/bin/nodejs
-RUN ln -sf NVM_DIR/versions/node/$NODE_VERSION/bin/node /usr/bin/node
-RUN ln -sf NVM_DIR/versions/node/$NODE_VERSION/bin/npm /usr/bin/npm
+
 
 RUN echo "source $NVM_DIR/nvm.sh && \
     nvm install $NODE_VERSION && \
     nvm alias default $NODE_VERSION && \
     nvm use default" | bash
 
+RUN ln -sf NVM_DIR/versions/node/$NODE_VERSION/bin/node /usr/bin/nodejs
+RUN ln -sf NVM_DIR/versions/node/$NODE_VERSION/bin/node /usr/bin/node
+RUN ln -sf NVM_DIR/versions/node/$NODE_VERSION/bin/npm /usr/bin/npm
 # confirm installation
 RUN node -v
 RUN npm -v
