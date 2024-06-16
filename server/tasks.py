@@ -61,9 +61,15 @@ def create_comfyui_project(
 
         # create a folder in project folder/comfyui/models that is a symlink to the models folder
         create_symlink(models_folder_path, os.path.join(project_folder_path, "comfyui", "models"))
+       
+        # remove the input folder that exists in comfyui and symlink the shared_input folder as input
+        if os.path.exists(os.path.join(project_folder_path, "comfyui", "input")):
+            shutil.rmtree(
+                os.path.join(project_folder_path, "comfyui", "input"), ignore_errors=True
+            )
 
         if not os.path.exists(input_folder_path):
-            os.makedirs(input_folder_path)
+            os.makedirs(input_folder_path, exist_ok=True)
         
         create_symlink(input_folder_path, os.path.join(project_folder_path, "comfyui", "input"))
 
