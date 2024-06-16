@@ -12,7 +12,8 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | b
     && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" \
     && nvm install node
 # Apply changes to the current shell
-RUN . /root/.bashrc
+RUN node --version
+RUN npm --version
 
 #RUN . "$NVM_DIR/nvm.sh" && nvm install 22
 #RUN . "$NVM_DIR/nvm.sh" && nvm use v22
