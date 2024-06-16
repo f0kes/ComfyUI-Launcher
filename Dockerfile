@@ -8,8 +8,8 @@ RUN apt-get update && apt-get install -y nodejs npm gcc g++ make wget && \
 RUN npm update -g npm
 RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 ENV NVM_DIR="/root/.nvm"
-RUN [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" 
-RUN nvm install node
+RUN . "$NVM_DIR/nvm.sh" && nvm install node
+
 
 
 RUN wget https://github.com/busyloop/envcat/releases/download/v1.1.0/envcat-1.1.0.linux-x86_64 \
