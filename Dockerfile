@@ -2,19 +2,19 @@ FROM pytorch/pytorch:2.2.1-cuda12.1-cudnn8-devel
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y nodejs npm gcc g++ make wget && \
+RUN apt-get update && apt-get install -y npm gcc g++ make wget && \
     rm -rf /var/lib/apt/lists/*
 
 RUN npm update -g npm
-RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-ENV NVM_DIR="/root/.nvm"
-RUN . "$NVM_DIR/nvm.sh" && nvm install 22
-RUN . "$NVM_DIR/nvm.sh" && nvm use v22
-RUN . "$NVM_DIR/nvm.sh" && nvm alias default v22
-ENV PATH="/root/.nvm/versions/node/v22/bin/:${PATH}"
-
-
-
+#RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+#ENV NVM_DIR="/root/.nvm"
+#RUN . "$NVM_DIR/nvm.sh" && nvm install 22
+#RUN . "$NVM_DIR/nvm.sh" && nvm use v22
+#RUN . "$NVM_DIR/nvm.sh" && nvm alias default v22
+#ENV PATH="/root/.nvm/versions/node/v22/bin/:${PATH}"
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - 
+RUN apt-get install -y nodejs
+    
 
 
 RUN wget https://github.com/busyloop/envcat/releases/download/v1.1.0/envcat-1.1.0.linux-x86_64 \
