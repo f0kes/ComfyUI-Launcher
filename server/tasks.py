@@ -6,8 +6,9 @@ from utils import COMFYUI_REPO_URL, create_symlink, create_virtualenv, install_d
 
 @shared_task(ignore_result=False)
 def create_comfyui_project(
-    project_folder_path, models_folder_path, id, name, launcher_json=None, port=None, create_project_folder=True
+    input_folder_path,project_folder_path, models_folder_path, id, name, launcher_json=None, port=None, create_project_folder=True
 ):
+    input_folder_path = os.path.abspath(input_folder_path)
     project_folder_path = os.path.abspath(project_folder_path)
     models_folder_path = os.path.abspath(models_folder_path)
 
@@ -60,6 +61,11 @@ def create_comfyui_project(
 
         # create a folder in project folder/comfyui/models that is a symlink to the models folder
         create_symlink(models_folder_path, os.path.join(project_folder_path, "comfyui", "models"))
+
+        if not os.path.exists(input_folder_path):
+            os.makedirs(input_folder_path)
+        
+        create_symlink(input_folder_path, os.path.join(project_folder_path, "comfyui", "input"))
 
         set_launcher_state_data(
             project_folder_path,

@@ -9,6 +9,9 @@ MODELS_DIR = os.environ.get("MODELS_DIR", "./models")
 os.makedirs(os.environ.get("TEMPLATES_DIR", "./templates"), exist_ok=True)
 TEMPLATES_DIR = os.environ.get("TEMPLATES_DIR", "./templates")
 
+os.makedirs(os.environ.get("INPUT_DIR", "./input"), exist_ok=True)
+INPUT_DIR = os.environ.get("INPUT_DIR", "./input")
+
 os.makedirs(os.environ.get("CELERY_DIR", ".celery"), exist_ok=True)
 os.makedirs(os.path.join(os.environ.get("CELERY_DIR", ".celery"), "results"), exist_ok=True)
 os.makedirs(os.path.join(os.environ.get("CELERY_DIR", ".celery"), "broker"), exist_ok=True)

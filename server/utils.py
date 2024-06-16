@@ -188,6 +188,7 @@ def setup_initial_models_folder(models_folder_path):
     shutil.rmtree(tmp_dir)
 
 
+
 def is_launcher_json_format(import_json):
     if "format" in import_json and import_json["format"] == "comfyui_launcher":
         return True
