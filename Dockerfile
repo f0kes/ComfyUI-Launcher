@@ -12,7 +12,7 @@ RUN npm update -g npm
 #RUN . "$NVM_DIR/nvm.sh" && nvm use v22
 #RUN . "$NVM_DIR/nvm.sh" && nvm alias default v22
 #ENV PATH="/root/.nvm/versions/node/v22/bin/:${PATH}"
-RUN wget -fsSL https://deb.nodesource.com/setup_22.x | -E bash -
+RUN wget -fsSL https://deb.nodesource.com/setup_22.x | bash -
 RUN apt-get install -y nodejs
     
 
