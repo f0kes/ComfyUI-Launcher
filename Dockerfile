@@ -19,7 +19,7 @@ RUN mkdir -p "$NVM_DIR"; \
     source $NVM_DIR/nvm.sh; \
     nvm install --lts --latest-npm
 
-RUN which nvm \
+RUN which nvasdm \
     && which node \
     && node --version \
     && which npm  \
