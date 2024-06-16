@@ -14,6 +14,7 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | b
 
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 ENV PATH="/home/node/.npm-global/bin:${PATH}"
+CMD ["/bin/sh"]
 # Apply changes to the current shell
 RUN node --version
 RUN npm --version
@@ -42,4 +43,4 @@ COPY nginx.conf /etc/nginx/nginx.conf.template
 
 WORKDIR /app/server
 
-CMD ["./entrypoint.sh"] 
+ENTRYPOINT ["./entrypoint.sh"] 
