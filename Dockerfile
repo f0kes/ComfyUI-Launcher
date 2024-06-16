@@ -14,24 +14,21 @@ RUN mkdir $NVM_DIR
 # https://github.com/creationix/nvm#install-script
 RUN curl --silent -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.2/install.sh | bash
 
-ENV NODE_PATH $NVM_DIR/$NODE_VERSION/lib/node_modules
-ENV PATH $NVM_DIR/versions/node/$NODE_VERSION/bin:$PATH
+ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
+ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
 
 # install node and npm
 
-
-
-
-
-RUN echo "source $NVM_DIR/nvm.sh && \
+# Install Node.js and npm
+RUN . $NVM_DIR/nvm.sh && \
     nvm install $NODE_VERSION && \
     nvm alias default $NODE_VERSION && \
-    nvm use default" | bash
+    nvm use default
 
-RUN ln -sf NVM_DIR/versions/node/$NODE_VERSION/bin/node /usr/bin/nodejs
-RUN ln -sf NVM_DIR/versions/node/$NODE_VERSION/bin/node /usr/bin/node
-RUN ln -sf NVM_DIR/versions/node/$NODE_VERSION/bin/npm /usr/bin/npm
+RUN ln -sf NVM_DIR/versions/node/v$NODE_VERSION/bin/node /usr/bin/nodejs
+RUN ln -sf NVM_DIR/versions/node/v$NODE_VERSION/bin/node /usr/bin/node
+RUN ln -sf NVM_DIR/versions/node/v$NODE_VERSION/bin/npm /usr/bin/npm
 # confirm installation
 RUN node -v
 RUN npm -v
