@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y gcc g++ make wget curl && \
     rm -rf /var/lib/apt/lists/*
 
 ENV NVM_DIR /usr/local/nvm
-ENV NODE_VERSION 4.4.7
+ENV NODE_VERSION 20.14.0
 
 # install nvm
 # https://github.com/creationix/nvm#install-script
