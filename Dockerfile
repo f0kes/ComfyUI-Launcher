@@ -9,6 +9,11 @@ RUN npm update -g npm
 RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 ENV NVM_DIR="/root/.nvm"
 RUN . "$NVM_DIR/nvm.sh" && nvm install 22
+RUN . "$NVM_DIR/nvm.sh" && nvm use v22
+RUN . "$NVM_DIR/nvm.sh" && nvm alias default v22
+ENV PATH="/root/.nvm/versions/node/v22/bin/:${PATH}"
+
+
 
 
 
