@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y nodejs npm gcc g++ make wget && \
 RUN npm update -g npm
 RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 ENV NVM_DIR="/root/.nvm"
-RUN . "$NVM_DIR/nvm.sh" && nvm install node
+RUN . "$NVM_DIR/nvm.sh" && nvm install 22
 
 
 
