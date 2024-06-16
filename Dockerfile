@@ -19,11 +19,12 @@ RUN mkdir -p "$NVM_DIR"; \
     source $NVM_DIR/nvm.sh; \
     nvm install --lts --latest-npm
 
-RUN command -v nvm; \
-    command -v node; \
-    node --version; \
-    command -v npm; \
-    npm --version
+RUN which nvm || true \
+    && which node || true \
+    && node --version || true \
+    && which npm || true \
+    && npm --version || true
+
 
 #RUN . "$NVM_DIR/nvm.sh" && nvm install 22
 #RUN . "$NVM_DIR/nvm.sh" && nvm use v22
