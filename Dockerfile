@@ -4,7 +4,7 @@ WORKDIR /app
 SHELL ["/bin/bash", "-l", "-euxo", "pipefail", "-c"]
 
 
-RUN apt-get update && apt-get install -y gcc g++ make wget && \
+RUN apt-get update && apt-get install -y gcc g++ make wget curl && \
     rm -rf /var/lib/apt/lists/*
 
 #RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
