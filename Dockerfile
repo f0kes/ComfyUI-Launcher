@@ -2,7 +2,7 @@ FROM pytorch/pytorch:2.2.1-cuda12.1-cudnn8-devel
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y gcc g++ make wget curl && \
+RUN apt-get update && apt-get install -y gcc g++ make wget curl git && \
     rm -rf /var/lib/apt/lists/*
 
 ENV NVM_DIR /usr/local/nvm
