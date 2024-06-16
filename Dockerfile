@@ -2,7 +2,11 @@ FROM pytorch/pytorch:2.2.1-cuda12.1-cudnn8-devel
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y nginx nodejs npm gcc g++ make wget && \
+RUN apt-get update && apt-get install -y curl
+
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
+
+RUN apt-get update && apt-get install -y nodejs npm gcc g++ make wget && \
     rm -rf /var/lib/apt/lists/*
 
 RUN wget https://github.com/busyloop/envcat/releases/download/v1.1.0/envcat-1.1.0.linux-x86_64 \
