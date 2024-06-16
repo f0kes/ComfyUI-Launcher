@@ -1,23 +1,33 @@
 FROM pytorch/pytorch:2.2.1-cuda12.1-cudnn8-devel
 
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+
+
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y gcc g++ make wget curl && \
     rm -rf /var/lib/apt/lists/*
 
-#RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-#ENV NVM_DIR="/root/.nvm"
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash \
-    && export NVM_DIR="$HOME/.nvm" \
-    && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" \
-    && nvm install node
+ENV NVM_DIR /usr/local/nvm
+ENV NODE_VERSION 4.4.7
 
-ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
-ENV PATH="/home/node/.npm-global/bin:${PATH}"
-CMD ["/bin/sh"]
-# Apply changes to the current shell
-RUN node --version
-RUN npm --version
+# install nvm
+# https://github.com/creationix/nvm#install-script
+RUN curl --silent -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.2/install.sh | bash
+
+# install node and npm
+RUN source $NVM_DIR/nvm.sh \
+    && nvm install $NODE_VERSION \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default
+
+# add node and npm to path so the commands are available
+ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
+ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+
+# confirm installation
+RUN node -v
+RUN npm -v
 
 #RUN . "$NVM_DIR/nvm.sh" && nvm install 22
 #RUN . "$NVM_DIR/nvm.sh" && nvm use v22
