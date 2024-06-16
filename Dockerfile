@@ -19,14 +19,14 @@ RUN mkdir -p "$NVM_DIR"; \
     source $NVM_DIR/nvm.sh; \
     nvm install --lts --latest-npm
 
-ENV PATH="/root/.nvm/versions/node/$(node -v)/bin:$PATH"
+# Add npm to the PATH by updating .bashrc
+RUN echo 'export NVM_DIR="/usr/local/nvm"' >> /etc/bash.bashrc \
+    && echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm' >> /etc/bash.bashrc \
+    && echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion' >> /etc/bash.bashrc \
+    && echo 'export PATH="/root/.nvm/versions/node/$(node -v)/bin:$PATH"' >> /etc/bash.bashrc
 
-RUN which nvm \
-    && which node \
-    && node --version \
-    && which npm  \
-    && npm --version
-
+# Apply changes to the current shell
+RUN . /root/.bashrc
 
 #RUN . "$NVM_DIR/nvm.sh" && nvm install 22
 #RUN . "$NVM_DIR/nvm.sh" && nvm use v22
