@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.1.1-cudnn8-devel-ubuntu22.04
+FROM pytorch/pytorch:2.2.1-cuda12.1-cudnn8-devel
 
 WORKDIR /app
 
