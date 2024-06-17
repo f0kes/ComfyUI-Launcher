@@ -6,7 +6,7 @@ import time
 import torch
 from flask import Flask, jsonify, request, render_template
 from showinfm import show_in_file_manager
-from settings import ALLOW_OVERRIDABLE_PORTS_PER_PROJECT, CELERY_BROKER_DIR, CELERY_RESULTS_DIR, INPUT_DIR, PROJECT_MAX_PORT, PROJECT_MIN_PORT, PROJECTS_DIR, MODELS_DIR, PROXY_MODE, SERVER_PORT, TEMPLATES_DIR
+from settings import ALLOW_OVERRIDABLE_PORTS_PER_PROJECT, CELERY_BROKER_DIR, CELERY_RESULTS_DIR, INPUT_DIR, OUTPUT_DIR, PROJECT_MAX_PORT, PROJECT_MIN_PORT, PROJECTS_DIR, MODELS_DIR, PROXY_MODE, SERVER_PORT, TEMPLATES_DIR
 import requests
 import os, psutil, sys
 from utils import (
@@ -154,6 +154,7 @@ def create_project():
 
     models_path = MODELS_DIR
     input_path = INPUT_DIR
+    output_path = OUTPUT_DIR
 
     launcher_json = None
     template_folder = os.path.join(TEMPLATES_DIR, template_id)
@@ -185,7 +186,7 @@ def create_project():
     )
 
     result = create_comfyui_project.delay(
-        input_path,project_path, models_path, id=id, name=name, launcher_json=launcher_json, port=port, create_project_folder=False
+        output_path, input_path,project_path, models_path, id=id, name=name, launcher_json=launcher_json, port=port, create_project_folder=False
     )
 
     with open(os.path.join(project_path, "setup_task_id.txt"), "w") as f:
@@ -212,6 +213,7 @@ def import_project():
 
     models_path = MODELS_DIR
     input_path = INPUT_DIR
+    output_path = OUTPUT_DIR
 
     if is_launcher_json_format(import_json):
         print("Detected launcher json format")
@@ -254,7 +256,7 @@ def import_project():
     )
 
     result = create_comfyui_project.delay(
-        input_path, project_path, models_path, id=id, name=name, launcher_json=launcher_json, port=port, create_project_folder=False
+        output_path, input_path, project_path, models_path, id=id, name=name, launcher_json=launcher_json, port=port, create_project_folder=False
     )
 
     with open(os.path.join(project_path, "setup_task_id.txt"), "w") as f:

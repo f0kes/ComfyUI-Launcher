@@ -6,8 +6,9 @@ from utils import COMFYUI_REPO_URL, create_symlink, create_virtualenv, install_d
 
 @shared_task(ignore_result=False)
 def create_comfyui_project(
-    input_folder_path,project_folder_path, models_folder_path, id, name, launcher_json=None, port=None, create_project_folder=True
+    output_folder_path,input_folder_path,project_folder_path, models_folder_path, id, name, launcher_json=None, port=None, create_project_folder=True
 ):
+    output_folder_path = os.path.abspath(output_folder_path)
     input_folder_path = os.path.abspath(input_folder_path)
     project_folder_path = os.path.abspath(project_folder_path)
     models_folder_path = os.path.abspath(models_folder_path)
@@ -72,6 +73,15 @@ def create_comfyui_project(
             os.makedirs(input_folder_path, exist_ok=True)
         
         create_symlink(input_folder_path, os.path.join(project_folder_path, "comfyui", "input"))
+        # remove the output folder that exists in comfyui and symlink the shared_output folder as output
+        if os.path.exists(os.path.join(project_folder_path, "comfyui", "output")):
+            shutil.rmtree(
+                os.path.join(project_folder_path, "comfyui", "output"), ignore_errors=True
+            )
+        if not os.path.exists(output_folder_path):
+            os.makedirs(output_folder_path, exist_ok=True)
+        create_symlink(output_folder_path, os.path.join(project_folder_path, "comfyui", "output"))
+
 
         set_launcher_state_data(
             project_folder_path,
