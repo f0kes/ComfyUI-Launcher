@@ -2,11 +2,34 @@ import json
 import os
 import shutil
 from celery import shared_task
-from utils import COMFYUI_REPO_URL, create_symlink, create_virtualenv, install_default_custom_nodes, install_pip_reqs, normalize_model_filepaths_in_workflow_json, run_command, run_command_in_project_venv, set_default_workflow_from_launcher_json, set_launcher_state_data, setup_custom_nodes_from_snapshot, setup_files_from_launcher_json, setup_initial_models_folder
+from utils import (
+    COMFYUI_REPO_URL,
+    create_symlink,
+    create_virtualenv,
+    install_default_custom_nodes,
+    install_pip_reqs,
+    normalize_model_filepaths_in_workflow_json,
+    run_command,
+    run_command_in_project_venv,
+    set_default_workflow_from_launcher_json,
+    set_launcher_state_data,
+    setup_custom_nodes_from_snapshot,
+    setup_files_from_launcher_json,
+    setup_initial_models_folder,
+)
+
 
 @shared_task(ignore_result=False)
 def create_comfyui_project(
-    output_folder_path,input_folder_path,project_folder_path, models_folder_path, id, name, launcher_json=None, port=None, create_project_folder=True
+    output_folder_path,
+    input_folder_path,
+    project_folder_path,
+    models_folder_path,
+    id,
+    name,
+    launcher_json=None,
+    port=None,
+    create_project_folder=True,
 ):
     output_folder_path = os.path.abspath(output_folder_path)
     input_folder_path = os.path.abspath(input_folder_path)
@@ -15,18 +38,32 @@ def create_comfyui_project(
 
     try:
         if create_project_folder:
-            assert not os.path.exists(project_folder_path), f"Project folder already exists at {project_folder_path}"
+            assert not os.path.exists(
+                project_folder_path
+            ), f"Project folder already exists at {project_folder_path}"
             os.makedirs(project_folder_path)
         else:
-            assert os.path.exists(project_folder_path), f"Project folder does not exist at {project_folder_path}"
+            assert os.path.exists(
+                project_folder_path
+            ), f"Project folder does not exist at {project_folder_path}"
 
         set_launcher_state_data(
             project_folder_path,
-            {"id":id,"name":name, "status_message": "Downloading ComfyUI...", "state": "download_comfyui"},
+            {
+                "id": id,
+                "name": name,
+                "status_message": "Downloading ComfyUI...",
+                "state": "download_comfyui",
+            },
         )
         # Modify the subprocess.run calls to capture and log the stdout
         run_command(
-            ["git", "clone", COMFYUI_REPO_URL, os.path.join(project_folder_path, 'comfyui')],
+            [
+                "git",
+                "clone",
+                COMFYUI_REPO_URL,
+                os.path.join(project_folder_path, "comfyui"),
+            ],
         )
 
         if launcher_json:
@@ -34,54 +71,63 @@ def create_comfyui_project(
             if comfyui_commit_hash:
                 run_command(
                     ["git", "checkout", comfyui_commit_hash],
-                    cwd=os.path.join(project_folder_path, 'comfyui'),
+                    cwd=os.path.join(project_folder_path, "comfyui"),
                 )
-            launcher_json['workflow_json'] = normalize_model_filepaths_in_workflow_json(launcher_json['workflow_json'])
+            launcher_json["workflow_json"] = normalize_model_filepaths_in_workflow_json(
+                launcher_json["workflow_json"]
+            )
 
-        
         # move the comfyui/web/index.html file to comfyui/web/comfyui_index.html
-        os.rename(
-            os.path.join(project_folder_path, "comfyui", "web", "index.html"),
-            os.path.join(project_folder_path, "comfyui", "web", "comfyui_index.html"),
-        )
+        #        os.rename(
+        #            os.path.join(project_folder_path, "comfyui", "web", "index.html"),
+        #            os.path.join(project_folder_path, "comfyui", "web", "comfyui_index.html"),
+        #        )
 
         # copy the web/comfy_frame.html file to comfyui/web/index.html
-        shutil.copy(
-            os.path.join("web", "comfy_frame.html"),
-            os.path.join(project_folder_path, "comfyui", "web", "index.html"),
-        )
+        #       shutil.copy(
+        #           os.path.join("web", "comfy_frame.html"),
+        #           os.path.join(project_folder_path, "comfyui", "web", "index.html"),
+        #       )
 
         # remove the models folder that exists in comfyui and symlink the shared_models folder as models
         if os.path.exists(os.path.join(project_folder_path, "comfyui", "models")):
             shutil.rmtree(
-                os.path.join(project_folder_path, "comfyui", "models"), ignore_errors=True
+                os.path.join(project_folder_path, "comfyui", "models"),
+                ignore_errors=True,
             )
 
         if not os.path.exists(models_folder_path):
             setup_initial_models_folder(models_folder_path)
 
         # create a folder in project folder/comfyui/models that is a symlink to the models folder
-        create_symlink(models_folder_path, os.path.join(project_folder_path, "comfyui", "models"))
-       
+        create_symlink(
+            models_folder_path, os.path.join(project_folder_path, "comfyui", "models")
+        )
+
         # remove the input folder that exists in comfyui and symlink the shared_input folder as input
         if os.path.exists(os.path.join(project_folder_path, "comfyui", "input")):
             shutil.rmtree(
-                os.path.join(project_folder_path, "comfyui", "input"), ignore_errors=True
+                os.path.join(project_folder_path, "comfyui", "input"),
+                ignore_errors=True,
             )
 
         if not os.path.exists(input_folder_path):
             os.makedirs(input_folder_path, exist_ok=True)
-        
-        create_symlink(input_folder_path, os.path.join(project_folder_path, "comfyui", "input"))
+
+        create_symlink(
+            input_folder_path, os.path.join(project_folder_path, "comfyui", "input")
+        )
         # remove the output folder that exists in comfyui and symlink the shared_output folder as output
         if os.path.exists(os.path.join(project_folder_path, "comfyui", "output")):
             shutil.rmtree(
-                os.path.join(project_folder_path, "comfyui", "output"), ignore_errors=True
+                os.path.join(project_folder_path, "comfyui", "output"),
+                ignore_errors=True,
             )
         if not os.path.exists(output_folder_path):
             os.makedirs(output_folder_path, exist_ok=True)
-        create_symlink(output_folder_path, os.path.join(project_folder_path, "comfyui", "output"))
-
+        create_symlink(
+            output_folder_path, os.path.join(project_folder_path, "comfyui", "output")
+        )
 
         set_launcher_state_data(
             project_folder_path,
@@ -89,7 +135,7 @@ def create_comfyui_project(
         )
 
         # create a new virtualenv in project folder/venv
-        create_virtualenv(os.path.join(project_folder_path, 'venv'))
+        create_virtualenv(os.path.join(project_folder_path, "venv"))
 
         # activate the virtualenv + install comfyui requirements
         run_command_in_project_venv(
