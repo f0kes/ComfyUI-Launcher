@@ -38,6 +38,8 @@ from utils import (
     slugify,
     update_config,
     check_url_structure,
+    get_comfyui_project_commit,
+    is_commit_newer,
 )
 from celery import Celery, Task
 from tasks import create_comfyui_project
@@ -316,8 +318,17 @@ def start_project(id):
     # assert pid, "Failed to start the project"
 
     # start the project
-    command = f"python main.py --port {port} --listen 0.0.0.0" #--front-end-version Comfy-Org/ComfyUI_frontend@latest
+    hardcoded_commit = "9aa39e7"
 
+    current_commit = get_comfyui_project_commit(id)
+    if current_commit:
+        if is_commit_newer(current_commit, hardcoded_commit, project_path):
+            command = f"python main.py --port {port} --listen 0.0.0.0 --front-end-version Comfy-Org/ComfyUI_frontend@latest"
+        else:
+            command = f"python main.py --port {port} --listen 0.0.0.0"
+    else:
+        command = f"python main.py --port {port} --listen 0.0.0.0"
+        print("Could not determine the commit of the ComfyUI project.")
     # check if gpus are available, if they aren't, use the cpu
     mps_available = hasattr(torch.backends, "mps") and torch.backends.mps.is_available()
     if not torch.cuda.is_available() and not mps_available:

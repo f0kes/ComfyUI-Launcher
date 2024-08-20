@@ -623,3 +623,48 @@ def create_symlink(source, target):
 
 def create_virtualenv(venv_path):
     run_command(["python", "-m", "venv", venv_path])
+
+
+def get_comfyui_project_commit(project_id):
+    """
+    This function returns the current commit hash of the ComfyUI project in the given repository.
+    """
+    project_path = os.path.join(PROJECTS_DIR, project_id)
+    comfyui_path = os.path.join(project_path, "comfyui")
+
+    if not os.path.exists(comfyui_path):
+        return None
+
+    # Get the current commit hash
+    process = subprocess.Popen(
+        ["git", "rev-parse", "HEAD"],
+        cwd=comfyui_path,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    stdout, stderr = process.communicate()
+
+    if process.returncode != 0:
+        return None
+
+    return stdout.decode().strip()
+
+
+def is_commit_newer(current_commit, hardcoded_commit, project_path):
+    """
+    This function compares the current commit with a hardcoded commit hash.
+    Returns True if the current_commit is newer than the hardcoded_commit.
+    """
+    comfyui_path = os.path.join(project_path, "comfyui")
+
+    # Check if the hardcoded_commit is an ancestor of current_commit
+    process = subprocess.Popen(
+        ["git", "merge-base", "--is-ancestor", hardcoded_commit, current_commit],
+        cwd=comfyui_path,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    process.communicate()
+
+    # If process returns 0, it means hardcoded_commit is an ancestor of current_commit
+    return process.returncode != 0
