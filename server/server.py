@@ -184,7 +184,18 @@ def create_project():
         with open(template_launcher_json_fp, "r") as f:
             launcher_json = json.load(f)
     else:
-        return jsonify({"success": False, "missing_models": [], "error": "errir"})
+        # template_workflow_json_fp = os.path.join(template_folder, "workflow.json")
+        # if os.path.exists(template_workflow_json_fp):
+        #     with open(template_workflow_json_fp, "r") as f:
+        #         template_workflow_json = json.load(f)
+        #     res = get_launcher_json_for_workflow_json(template_workflow_json, resolved_missing_models=[], skip_model_validation=True)
+        #     if (res["success"] and res["launcher_json"]):
+        #         launcher_json = res["launcher_json"]
+        #     else:
+        #         return jsonify({ "success": False, "missing_models": [], "error": res["error"] })
+
+        # return jsonify({"success": False, "missing_models": [], "error": "errir"})
+        pass
 
     print(f"Creating project with id {id} and name {name} from template {template_id}")
 
