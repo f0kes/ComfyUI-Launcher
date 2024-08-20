@@ -667,4 +667,4 @@ def is_commit_newer(current_commit, hardcoded_commit, project_path):
     process.communicate()
 
     # If process returns 0, it means hardcoded_commit is an ancestor of current_commit
-    return process.returncode != 0
+    return process.returncode == 0
