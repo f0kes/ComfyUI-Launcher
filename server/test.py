@@ -1,4 +1,8 @@
-from utils import create_comfyui_project, get_launcher_json_for_workflow_json, run_command_in_project_comfyui_venv
+from utils import (
+    create_comfyui_project,
+    get_launcher_json_for_workflow_json,
+    run_command_in_project_comfyui_venv,
+)
 import os, json
 
 if __name__ == "__main__":
@@ -18,6 +22,6 @@ if __name__ == "__main__":
     workflow_json_path = "./subby_ramesh_ultra_upscale_comfyworkflows.json"
     with open(workflow_json_path, "r") as f:
         workflow_json = json.load(f)
-    launcher_json = get_launcher_json_for_workflow_json(workflow_json)
-    with open("./subby_ramesh_ultra_upscale_comfyui-launcher.json", "w") as f:
-        json.dump(launcher_json, f, indent=4)
+    # launcher_json = get_launcher_json_for_workflow_json(workflow_json)
+    # with open("./subby_ramesh_ultra_upscale_comfyui-launcher.json", "w") as f:
+    #    json.dump(launcher_json, f, indent=4)

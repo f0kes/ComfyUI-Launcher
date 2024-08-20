@@ -6,7 +6,20 @@ import time
 import torch
 from flask import Flask, jsonify, request, render_template
 from showinfm import show_in_file_manager
-from settings import ALLOW_OVERRIDABLE_PORTS_PER_PROJECT, CELERY_BROKER_DIR, CELERY_RESULTS_DIR, INPUT_DIR, OUTPUT_DIR, PROJECT_MAX_PORT, PROJECT_MIN_PORT, PROJECTS_DIR, MODELS_DIR, PROXY_MODE, SERVER_PORT, TEMPLATES_DIR
+from settings import (
+    ALLOW_OVERRIDABLE_PORTS_PER_PROJECT,
+    CELERY_BROKER_DIR,
+    CELERY_RESULTS_DIR,
+    INPUT_DIR,
+    OUTPUT_DIR,
+    PROJECT_MAX_PORT,
+    PROJECT_MIN_PORT,
+    PROJECTS_DIR,
+    MODELS_DIR,
+    PROXY_MODE,
+    SERVER_PORT,
+    TEMPLATES_DIR,
+)
 import requests
 import os, psutil, sys
 from utils import (
@@ -24,10 +37,11 @@ from utils import (
     set_launcher_state_data,
     slugify,
     update_config,
-    check_url_structure
+    check_url_structure,
 )
 from celery import Celery, Task
 from tasks import create_comfyui_project
+
 
 def celery_init_app(app: Flask) -> Celery:
     class FlaskTask(Task):
@@ -41,23 +55,26 @@ def celery_init_app(app: Flask) -> Celery:
     app.extensions["celery"] = celery_app
     return celery_app
 
-CW_ENDPOINT = os.environ.get("CW_ENDPOINT", "https://comfyworkflows.com")
 
 app = Flask(
-    __name__, static_url_path="", static_folder="../web/dist", template_folder="../web/dist"
+    __name__,
+    static_url_path="",
+    static_folder="../web/dist",
+    template_folder="../web/dist",
 )
 app.config.from_mapping(
     CELERY=dict(
         result_backend=f"file://{CELERY_RESULTS_DIR}",
         broker_url=f"filesystem://",
         broker_transport_options={
-            'data_folder_in': CELERY_BROKER_DIR,
-            'data_folder_out': CELERY_BROKER_DIR,
-        }
+            "data_folder_in": CELERY_BROKER_DIR,
+            "data_folder_out": CELERY_BROKER_DIR,
+        },
     ),
     task_ignore_result=True,
 )
 celery_app = celery_init_app(app)
+
 
 @app.route("/api/open_models_folder")
 def open_models_folder():
@@ -65,14 +82,18 @@ def open_models_folder():
     show_in_file_manager(MODELS_DIR)
     return ""
 
+
 @app.route("/api/settings")
 def api_settings():
-    return jsonify({
-        "PROJECT_MIN_PORT": PROJECT_MIN_PORT,
-        "PROJECT_MAX_PORT": PROJECT_MAX_PORT,
-        "ALLOW_OVERRIDABLE_PORTS_PER_PROJECT": ALLOW_OVERRIDABLE_PORTS_PER_PROJECT,
-        "PROXY_MODE": PROXY_MODE
-    })
+    return jsonify(
+        {
+            "PROJECT_MIN_PORT": PROJECT_MIN_PORT,
+            "PROJECT_MAX_PORT": PROJECT_MAX_PORT,
+            "ALLOW_OVERRIDABLE_PORTS_PER_PROJECT": ALLOW_OVERRIDABLE_PORTS_PER_PROJECT,
+            "PROXY_MODE": PROXY_MODE,
+        }
+    )
+
 
 @app.route("/api/projects", methods=["GET"])
 def list_projects():
@@ -92,7 +113,7 @@ def list_projects():
                 "project_folder_name": proj_folder,
                 "project_folder_path": full_proj_path,
                 "last_modified": os.stat(full_proj_path).st_mtime,
-                "port" : project_port
+                "port": project_port,
             }
         )
 
@@ -114,7 +135,7 @@ def get_project(id):
             "project_folder_name": id,
             "project_folder_path": project_path,
             "last_modified": os.stat(project_path).st_mtime,
-            "port" : project_port
+            "port": project_port,
         }
     )
 
@@ -163,16 +184,8 @@ def create_project():
         with open(template_launcher_json_fp, "r") as f:
             launcher_json = json.load(f)
     else:
-        template_workflow_json_fp = os.path.join(template_folder, "workflow.json")
-        if os.path.exists(template_workflow_json_fp):
-            with open(template_workflow_json_fp, "r") as f:
-                template_workflow_json = json.load(f)
-            res = get_launcher_json_for_workflow_json(template_workflow_json, resolved_missing_models=[], skip_model_validation=True)
-            if (res["success"] and res["launcher_json"]):
-                launcher_json = res["launcher_json"]
-            else:
-                return jsonify({ "success": False, "missing_models": [], "error": res["error"] })
-    
+        return jsonify({"success": False, "missing_models": [], "error": "errir"})
+
     print(f"Creating project with id {id} and name {name} from template {template_id}")
 
     # set the project's first status message
@@ -182,16 +195,29 @@ def create_project():
     os.makedirs(project_path)
     set_launcher_state_data(
         project_path,
-        {"id":id,"name":name, "status_message": "Downloading ComfyUI...", "state": "download_comfyui"},
+        {
+            "id": id,
+            "name": name,
+            "status_message": "Downloading ComfyUI...",
+            "state": "download_comfyui",
+        },
     )
 
     result = create_comfyui_project.delay(
-        output_path, input_path,project_path, models_path, id=id, name=name, launcher_json=launcher_json, port=port, create_project_folder=False
+        output_path,
+        input_path,
+        project_path,
+        models_path,
+        id=id,
+        name=name,
+        launcher_json=launcher_json,
+        port=port,
+        create_project_folder=False,
     )
 
     with open(os.path.join(project_path, "setup_task_id.txt"), "w") as f:
         f.write(result.id)
-    
+
     return jsonify({"success": True, "id": id})
 
 
@@ -219,32 +245,11 @@ def import_project():
         print("Detected launcher json format")
         launcher_json = import_json
     else:
-        print("Detected workflow json format, converting to launcher json format")
-        #only resolve missing models for workflows w/ workflow json format
-        skip_model_validation = True if skipping_model_validation else False
-        if len(resolved_missing_models) > 0:
-            for model in resolved_missing_models:
-                if (model["filename"] is None or model["node_type"] is None or model["dest_relative_path"] is None):
-                    return jsonify({ "success": False, "error": f"one of the resolved models has an empty filename, node type, or destination path. please try again." })
-                elif (model["source"]["url"] is not None and model["source"]["file_id"] is None):
-                    is_valid = check_url_structure(model["source"]["url"])
-                    if (is_valid is False):
-                        return jsonify({ "success": False, "error": f"the url f{model['source']['url']} is invalid. please make sure it is a link to a model file on huggingface or a civitai model." })
-                elif (model["source"]["file_id"] is None and model["source"]["url"] is None):
-                    return jsonify({ "success": False, "error": f"you didn't select one of the suggestions (or import a url) for the following missing file: {model['filename']}" })
-            skip_model_validation = True
+        print("Wrong format")
+        # todo: make a conversion function
 
-        res = get_launcher_json_for_workflow_json(import_json, resolved_missing_models, skip_model_validation)
-        if (res["success"] and res["launcher_json"]):
-            launcher_json = res["launcher_json"]
-        elif (res["success"] is False and res["error"] == "MISSING_MODELS" and len(res["missing_models"]) > 0):
-            return jsonify({ "success": False, "missing_models": res["missing_models"], "error": res["error"] })
-        else:
-            print(f"something went wrong when fetching res from get_launcher_json_for_workflow_json: {res}")
-            return jsonify({ "success": False, "error": res["error"] })
-        
     print(f"Creating project with id {id} and name {name} from imported json")
-    
+
     # set the project's first status message
     assert not os.path.exists(
         project_path
@@ -252,17 +257,30 @@ def import_project():
     os.makedirs(project_path)
     set_launcher_state_data(
         project_path,
-        {"id":id,"name":name, "status_message": "Downloading ComfyUI...", "state": "download_comfyui"},
+        {
+            "id": id,
+            "name": name,
+            "status_message": "Downloading ComfyUI...",
+            "state": "download_comfyui",
+        },
     )
 
     result = create_comfyui_project.delay(
-        output_path, input_path, project_path, models_path, id=id, name=name, launcher_json=launcher_json, port=port, create_project_folder=False
+        output_path,
+        input_path,
+        project_path,
+        models_path,
+        id=id,
+        name=name,
+        launcher_json=launcher_json,
+        port=port,
+        create_project_folder=False,
     )
 
     with open(os.path.join(project_path, "setup_task_id.txt"), "w") as f:
         f.write(result.id)
-    
-    return jsonify({"success": True, "id": id}) 
+
+    return jsonify({"success": True, "id": id})
 
 
 @app.route("/api/projects/<id>/start", methods=["POST"])
@@ -296,13 +314,11 @@ def start_project(id):
         command += " --cpu"
 
     if os.name == "nt":
-        command = f"start \"\" cmd /c \"{command}\""
-    
+        command = f'start "" cmd /c "{command}"'
+
     print(f"USING COMMAND: {command}. PORT: {port}")
 
-    pid = run_command_in_project_comfyui_venv(
-        project_path, command, in_bg=True
-    )
+    pid = run_command_in_project_comfyui_venv(project_path, command, in_bg=True)
     assert pid, "Failed to start the project"
 
     # wait until the port is bound
@@ -314,7 +330,8 @@ def start_project(id):
         time.sleep(1)
 
     set_launcher_state_data(
-        project_path, {"state": "running", "status_message" : "Running...", "port": port, "pid": pid}
+        project_path,
+        {"state": "running", "status_message": "Running...", "port": port, "pid": pid},
     )
     return jsonify({"success": True, "port": port})
 
@@ -340,7 +357,10 @@ def stop_project(id):
     except:
         pass
 
-    set_launcher_state_data(project_path, {"state": "ready", "status_message" : "Ready", "port": None, "pid": None})
+    set_launcher_state_data(
+        project_path,
+        {"state": "ready", "status_message": "Ready", "port": None, "pid": None},
+    )
     return jsonify({"success": True})
 
 
@@ -370,11 +390,12 @@ def delete_project(id):
     return jsonify({"success": True})
 
 
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
 @app.errorhandler(404)
 def index(path):
     return render_template("index.html")
+
 
 if __name__ == "__main__":
     print("Starting ComfyUI Launcher...")

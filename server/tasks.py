@@ -77,17 +77,17 @@ def create_comfyui_project(
                 launcher_json["workflow_json"]
             )
 
-        # move the comfyui/web/index.html file to comfyui/web/comfyui_index.html
-        os.rename(
-            os.path.join(project_folder_path, "comfyui", "web", "index.html"),
-            os.path.join(project_folder_path, "comfyui", "web", "comfyui_index.html"),
-        )
+        # # move the comfyui/web/index.html file to comfyui/web/comfyui_index.html
+        # os.rename(
+        #     os.path.join(project_folder_path, "comfyui", "web", "index.html"),
+        #     os.path.join(project_folder_path, "comfyui", "web", "comfyui_index.html"),
+        # )
 
-        # copy the web/comfy_frame.html file to comfyui/web/index.html
-        shutil.copy(
-            os.path.join("web", "comfy_frame.html"),
-            os.path.join(project_folder_path, "comfyui", "web", "index.html"),
-        )
+        # # copy the web/comfy_frame.html file to comfyui/web/index.html
+        # shutil.copy(
+        #     os.path.join("web", "comfy_frame.html"),
+        #     os.path.join(project_folder_path, "comfyui", "web", "index.html"),
+        # )
 
         # remove the models folder that exists in comfyui and symlink the shared_models folder as models
         if os.path.exists(os.path.join(project_folder_path, "comfyui", "models")):
