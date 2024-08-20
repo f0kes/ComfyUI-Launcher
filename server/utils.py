@@ -242,10 +242,10 @@ def install_default_custom_nodes(project_folder_path, launcher_json=None):
     # run_command(["git", "clone", f"https://github.com/thecooltechguy/ComfyUI-ComfyWorkflows", os.path.join(project_folder_path, 'comfyui', 'custom_nodes', 'ComfyUI-ComfyWorkflows')])
 
     # pip install comfyui-comfyworkflows
-    run_command_in_project_venv(
-        project_folder_path,
-        f"pip install -r {os.path.join(project_folder_path, 'comfyui', 'custom_nodes', 'ComfyUI-ComfyWorkflows', 'requirements.txt')}",
-    )
+    # run_command_in_project_venv(
+    #     project_folder_path,
+    #     f"pip install -r {os.path.join(project_folder_path, 'comfyui', 'custom_nodes', 'ComfyUI-ComfyWorkflows', 'requirements.txt')}",
+    # )
 
 
 def setup_initial_models_folder(models_folder_path):
