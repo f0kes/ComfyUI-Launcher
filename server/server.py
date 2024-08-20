@@ -316,7 +316,7 @@ def start_project(id):
     # assert pid, "Failed to start the project"
 
     # start the project
-    command = f"python main.py --port {port} --listen 0.0.0.0"
+    command = f"python main.py --port {port} --listen 0.0.0.0 --front-end-version Comfy-Org/ComfyUI_frontend@latest"
 
     # check if gpus are available, if they aren't, use the cpu
     mps_available = hasattr(torch.backends, "mps") and torch.backends.mps.is_available()
