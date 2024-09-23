@@ -323,7 +323,7 @@ def start_project(id):
     current_commit = get_comfyui_project_commit(id)
     if current_commit:
         if is_commit_newer(current_commit, hardcoded_commit, project_path):
-            command = f"python main.py --port {port} --listen 0.0.0.0 --front-end-version Comfy-Org/ComfyUI_frontend@v1.1.0"
+            command = f"python main.py --port {port} --listen 0.0.0.0 --front-end-version Comfy-Org/ComfyUI_frontend@v1.2.0"
         else:
             command = f"python main.py --port {port} --listen 0.0.0.0"
     else:
